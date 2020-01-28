@@ -206,6 +206,8 @@ def path_to_operation(path, verb):
     else:
         sanitised = path.translate(character_map)
         operation = u"_".join(p for p in sanitised.split("/"))
+        operation = operation.replace('.', '_')
+        operation = operation.replace('-', '_')
 
     return "{}_{}".format(verb, operation)
 
