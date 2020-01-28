@@ -107,7 +107,8 @@ MAPPINGS = {
     # Types
     "text": (lambda *args, **kwargs: "TextField()"),
     "string": (lambda *args, **kwargs: "CharField(max_length={max_length})".format(max_length=255)),
-    "id": (lambda *args, **kwargs: "CharField(max_length={max_length}, primary_key=True)".format(max_length=255)),
+    "string_id": (lambda *args, **kwargs: "CharField(max_length={max_length}, primary_key=True)".format(max_length=255)),
+    "integer_id": (lambda *args, **kwargs: "IntegerField(primary_key=True)"),
     "boolean": (lambda *args, **kwargs: "BooleanField()"),
     "date": (lambda *args, **kwargs: "DateField()"),
     "date-time": (lambda *args, **kwargs: "DateTimeField()"),
@@ -208,6 +209,7 @@ def path_to_operation(path, verb):
         operation = u"_".join(p for p in sanitised.split("/"))
         operation = operation.replace('.', '_')
         operation = operation.replace('-', '_')
+        operation = operation.lower()
 
     return "{}_{}".format(verb, operation)
 
@@ -299,7 +301,7 @@ class Generator(object):
             for verb, io in verbs.items():  # io => input/output options
                 # Look up the name of the operation and construct one if not found
                 operation = self.PATH_VERB_OPERATION_MAP.get(
-                    (path, verb), path_to_operation(path, verb)
+                    (path, verb), path_to_operation(class_name, verb)
                 )
                 payload = {
                     "operation": operation,
@@ -424,7 +426,9 @@ class Generator(object):
                     continue
                 else:
                     if field["name"] == "id" and property["type"] == "string":
-                        property["type"] = "id"
+                        property["type"] = "string_id"
+                    if field["name"] == "id" and property["type"] == "integer":
+                        property["type"] = "integer_id"
                     field["class"] = MAPPINGS[property["type"]]()
                 fields.append(field)
             definition['fields'] = fields
