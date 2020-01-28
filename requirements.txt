@@ -1,5 +1,5 @@
 # Never versions invalidates some of the specs used for testing
-swagger-spec-validator==2.1.0
+swagger-spec-validator
 
 -e git+https://github.com/praekelt/apitools@master#egg=apitools
 -e git+https://github.com/praekelt/swagger-parser@master#egg=swagger-parser
