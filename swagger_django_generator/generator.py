@@ -7,6 +7,8 @@ import os
 import sys
 from swagger_parser import SwaggerParser
 
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 DEFAULT_OUTPUT_DIR = "./generated"
 DEFAULT_MODULE = "generated"
 
@@ -96,6 +98,33 @@ SEPARATORS = {
 }
 
 
+MAPPINGS = {
+    # Relations
+    "fk": (lambda app_name, field_name: "ForeignKey(\"{app_name}.{to}\", on_delete=models.CASCADE)".format(app_name=app_name, to=field_name)),
+    "o2o": (lambda field_name: "ForeignKey(\"{to}\")".format(to=field_name)),
+    "m2m": (lambda field_name: "ForeignKey(\"{to}\")".format(to=field_name)),
+
+    # Types
+    "text": (lambda *args, **kwargs: "TextField()"),
+    "string": (lambda *args, **kwargs: "CharField(max_length={max_length})".format(max_length=255)),
+    "string_id": (lambda *args, **kwargs: "CharField(max_length={max_length}, primary_key=True)".format(max_length=255)),
+    "integer_id": (lambda *args, **kwargs: "IntegerField(primary_key=True)"),
+    "boolean": (lambda *args, **kwargs: "BooleanField()"),
+    "date": (lambda *args, **kwargs: "DateField()"),
+    "date-time": (lambda *args, **kwargs: "DateTimeField()"),
+    "decimal": (lambda *args, **kwargs: "DecimalField()"),
+    "filepath": (lambda *args, **kwargs: "FilePathField()"),
+    "number": (lambda *args, **kwargs: "FloatField()"),
+    "integer": (lambda *args, **kwargs: "IntegerField()"),
+    "ip": (lambda *args, **kwargs: "IPAddressField()"),
+    "gip": (lambda *args, **kwargs: "GenericIPAddressField()"),
+    "nboolean": (lambda *args, **kwargs: "NullBooleanField()"),
+    "time": (lambda *args, **kwargs: "TimeField()"),
+    "binary": (lambda *args, **kwargs: "BinaryField()"),
+    "auto": (lambda *args, **kwargs: "AutoField()"),
+}
+
+
 def parse_array(schema):
     # type: (Dict) -> string
     return '{name} = {name}.split("{separator}")'.format(
@@ -178,6 +207,9 @@ def path_to_operation(path, verb):
     else:
         sanitised = path.translate(character_map)
         operation = u"_".join(p for p in sanitised.split("/"))
+        operation = operation.replace('.', '_')
+        operation = operation.replace('-', '_')
+        operation = operation.lower()
 
     return "{}_{}".format(verb, operation)
 
@@ -206,6 +238,7 @@ class Generator(object):
         self.parser = None
         self.module_name = module_name
         self._classes = None
+        self._models = None
 
     def load_specification(self, specification_path, spec_format=None):
         # If the swagger spec format is not specified explicitly, we try to
@@ -235,7 +268,9 @@ class Generator(object):
             self.parser.operation.items()
         }
 
+        self._make_model_definitions()
         self._make_class_definitions()
+
 
     def resolve_schema_references(self, definition):
         # type: (Generator, Dict) -> None
@@ -266,7 +301,7 @@ class Generator(object):
             for verb, io in verbs.items():  # io => input/output options
                 # Look up the name of the operation and construct one if not found
                 operation = self.PATH_VERB_OPERATION_MAP.get(
-                    (path, verb), path_to_operation(path, verb)
+                    (path, verb), path_to_operation(class_name, verb)
                 )
                 payload = {
                     "operation": operation,
@@ -279,6 +314,7 @@ class Generator(object):
 
                 # Add arguments
                 for name, detail in io["parameters"].items():
+                    if "required" not in detail: detail["required"] = False
                     location = detail["in"]
                     if location == "path":
                         section = "required_args" if detail["required"] else \
@@ -368,6 +404,36 @@ class Generator(object):
 
                 self._classes[class_name][verb] = payload
 
+    def _make_model_definitions(self):
+        self._models = []
+        definitions = copy.deepcopy(self.parser.specification['definitions'])
+        for model_name, definition in definitions.items():
+            if "type" not in definition:
+                definition["type"] = "object"
+            definition['name'] = model_name
+            fields = []
+            for name, property in definition["properties"].items():
+                field = {}
+                field['name'] = name
+                if 'type' in property and property['type'] == 'string' and 'format' in property and property['format'] in MAPPINGS.keys():
+                    property['type'] = property['format']
+                if "type" not in property or property["type"] == "object":
+                    if "$ref" not in property.keys(): continue
+                    related_to = property["$ref"].split("/")[-1]
+                    field["class"] = MAPPINGS["fk"](self.module_name, related_to)
+                elif property["type"] == "array":
+                    # Todo
+                    continue
+                else:
+                    if field["name"] == "id" and property["type"] == "string":
+                        property["type"] = "string_id"
+                    if field["name"] == "id" and property["type"] == "integer":
+                        property["type"] = "integer_id"
+                    field["class"] = MAPPINGS[property["type"]]()
+                fields.append(field)
+            definition['fields'] = fields
+            self._models.append(definition)
+
     def generate_urls(self):
         # type: (Generator) -> str
         """
@@ -383,7 +449,8 @@ class Generator(object):
         return render_to_string(
             self.backend, "urls.py", {
                 "entries": entries,
-                "module": self.module_name
+                "module": self.module_name,
+                "models": self._models,
             })
 
     def generate_schemas(self):
@@ -439,6 +506,50 @@ class Generator(object):
         """
         return render_to_string(self.backend, "utils.py", {})
 
+    def generate_models(self):
+        # type: (Generator) -> str
+        """
+        Generate a `models.py` file from the given specification.
+        :return: str
+        """
+        return render_to_string(self.backend, "models.py", {
+            "models": self._models,
+            "app_name": self.module_name
+        })
+
+    def generate_admin(self):
+        # type: (Generator) -> str
+        """
+        Generate a `admin.py` file from the given specification.
+        :return: str
+        """
+        return render_to_string(self.backend, "admin.py", {
+            "models": self._models,
+            "app_name": self.module_name
+        })
+
+    def generate_api(self):
+        # type: (Generator) -> str
+        """
+        Generate a `api.py` file from the given specification.
+        :return: str
+        """
+        return render_to_string(self.backend, "api.py", {
+            "models": self._models,
+            "app_name": self.module_name
+        })
+
+    def generate_serializers(self):
+        # type: (Generator) -> str
+        """
+        Generate a `serializers.py` file from the given specification.
+        :return: str
+        """
+        return render_to_string(self.backend, "serializers.py", {
+            "models": self._models,
+            "app_name": self.module_name
+        })
+
 @click.command()
 @click.argument("specification_path", type=click.Path(dir_okay=False, exists=True))
 @click.option("--spec-format", type=click.Choice(SPEC_CHOICES))
@@ -461,8 +572,17 @@ class Generator(object):
               help="Use an alternative filename for the utilities.")
 @click.option("--stubs-file", type=str,  default="stubs.py",
               help="Use an alternative filename for the utilities.")
+@click.option("--models-file", type=str,  default="models.py",
+              help="Use an alternative filename for the utilities.")
+@click.option("--admin-file", type=str,  default="admin.py",
+              help="Use an alternative filename for the utilities.")
+@click.option("--api-file", type=str,  default="api.py",
+              help="Use an alternative filename for the utilities.")
+@click.option("--serializers-file", type=str,  default="serializers.py",
+              help="Use an alternative filename for the utilities.")
+              
 def main(specification_path, spec_format, backend, verbose, output_dir, module_name,
-         urls_file, views_file, schemas_file, utils_file, stubs_file):
+         urls_file, views_file, schemas_file, utils_file, stubs_file, models_file, admin_file, api_file, serializers_file):
 
     generator = Generator(backend, module_name=module_name)
     try:
@@ -500,6 +620,34 @@ def main(specification_path, spec_format, backend, verbose, output_dir, module_n
         click.secho("Generating stubs file...", fg="green")
         with open(os.path.join(output_dir, stubs_file), "w") as f:
             data = generator.generate_stubs()
+            f.write(data)
+            if verbose:
+                print(data)
+
+        click.secho("Generating models file...", fg="green")
+        with open(os.path.join(output_dir, models_file), "w") as f:
+            data = generator.generate_models()
+            f.write(data)
+            if verbose:
+                print(data)
+
+        click.secho("Generating admin file...", fg="green")
+        with open(os.path.join(output_dir, admin_file), "w") as f:
+            data = generator.generate_admin()
+            f.write(data)
+            if verbose:
+                print(data)
+
+        click.secho("Generating api file...", fg="green")
+        with open(os.path.join(output_dir, api_file), "w") as f:
+            data = generator.generate_api()
+            f.write(data)
+            if verbose:
+                print(data)
+
+        click.secho("Generating serializers file...", fg="green")
+        with open(os.path.join(output_dir, serializers_file), "w") as f:
+            data = generator.generate_serializers()
             f.write(data)
             if verbose:
                 print(data)

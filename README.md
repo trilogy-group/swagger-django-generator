@@ -27,6 +27,9 @@ In particular, the following files are currently generated:
   request body arguments,
 * `utils.py`, containing utility functions that can be tweaked, if necessary, and
 * `stubs.py`, containing the abstract base class for the API functions, as well as a class containing mocked implementations of the functions.
+* `api.py`, containing the viewsets for the Django ORMs
+* `serializers.py`, contains serializers for the ORMs
+* `admin.py`, registers the object models created so that they can be accessed/edited from the admin console
 
 ## Getting started
 A virtual environment can be set up by running
