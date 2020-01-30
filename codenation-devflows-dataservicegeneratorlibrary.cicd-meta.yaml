@@ -26,18 +26,13 @@ buildAndDistribute:
         command: echo none
         artifactDir: ./target
     distribution:
-        artifactUploadCommand: 'python setup.py sdist && twine upload --repository-url
+        artifactUploadCommand: python setup.py sdist && twine upload --repository-url
             https://pypi.swarm.devfactory.com/ --verbose dist/* --username $username
-            --password $password '
+            --password $password
 deployment:
     serviceName: DevflowDataserviceTest
     overridableProps:
         guiType: N/A
-        envVars:
-          - key: password
-            secret: true
-          - key: username
-            secret: true
         canUseLb: true
         provision:
             os: Amazon linux 2
