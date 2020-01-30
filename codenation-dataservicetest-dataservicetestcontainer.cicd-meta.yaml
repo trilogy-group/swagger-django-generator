@@ -1,0 +1,37 @@
+version: v3
+navigator:
+    name: Sri Vathsa
+    email: vathsa.vemula@codenation.co.in
+companyName: CodeNation
+productName: DataServiceTest
+c4containerName: DataServiceTestContainer
+repoUrl: https://github.com/trilogy-group/swagger-django-generator
+githubTeamName: CN
+repoBranch: add-crud-serializers
+type: Distributable artifacts
+buildAndDistribute:
+    techStack: Python
+    os: Ubuntu 18.04
+    toolchainVersion: python 3.6
+    runtimeVersion: python 3.6
+    build:
+        tool: NA
+        preBuildCommand: echo none
+        buildCommand: echo none
+    test:
+        utFramework: pytest
+        testCommand: python -m unittest
+        coverageReport:
+            type: Cobertura
+            path: None
+        testReport:
+            type: None
+            path: None
+    package:
+        tool: pip
+        command: echo none
+        artifactDir: ./target
+    distribution:
+        artifactUploadCommand: echo none
+deployment:
+    serviceName: ""
