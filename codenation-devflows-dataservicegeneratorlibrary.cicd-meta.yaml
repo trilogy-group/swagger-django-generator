@@ -2,21 +2,21 @@ version: v3
 navigator:
   name: Sai Sri Vathsa Vemula
   email: vathsa.vemula@codenation.co.in
-companyName: CodeNation  
+companyName: CodeNation
 productName: devflows
 c4containerName: DataServiceGeneratorLibrary
 repoUrl: https://github.com/trilogy-group/swagger-django-generator
 repoBranch: master
 githubTeamName: CN
-needsLowLevelHardwareAccess: False
-needsDockerServer: False
+needsLowLevelHardwareAccess: false
+needsDockerServer: false
 type: Deployable service
 buildAndDistribute:
   types:
     name: ci
-  sourceDependencies:
-  triggerOnSuccessOf: 
-  envVars:
+  sourceDependencies: null
+  triggerOnSuccessOf: null
+  envVars: null
   os: Ubuntu 18.04
   techStack: Python
   toolchainVersion: python 3.6
@@ -36,21 +36,21 @@ buildAndDistribute:
     artifactUploadCommand: echo none
   requiresIntegrationTests: false
 deployment:
-  dependentServices:
-  serviceName: DataServiceGeneratorLibrary 
+  dependentServices: null
+  serviceName: DataServiceGeneratorLibrary
   overridableProps:
     guiType: N/A
-    envVars:
-    ports:
+    envVars: null
+    ports: null
     stickySessions: false
     canUseLb: true
     stablePersistence: false
     fixedNetworkIdentifier: false
-    storage:
+    storage: null
     provision:
       os: Amazon linux 2
       prepareEnvCommand: None
-      command: "echo none"
+      command: echo none
       checkCommand: None
     install:
       dockerized: true
@@ -58,12 +58,19 @@ deployment:
       runtimeEnv: python 3.6
       installCommand: None
     run:
-      command: 'N/A will run on devflows'
+      command: N/A will run on devflows
       userName: root
       os: Ubuntu 18.04
       mode: doNothing
     deploymentCheck:
       exec:
-        command: 'N/A will run on devflows'
+        command: N/A will run on devflows
   targets:
-    - name: Default
+  - name: Default
+devhub:
+  output:
+    ci:
+      buildLogs: https://jaeger.devhub.k8.devfactory.com/search?service=trilogy-group-swagger-django-generator
+      artifactsRepo:
+      - type: raw
+        url: https://nexus.devfactory.com/repository/devflows-raw-release/
