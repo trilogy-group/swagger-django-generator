@@ -39,7 +39,7 @@ deployment:
         guiType: N/A
         canUseLb: true
         provision:
-            os: Amazon linux 2
+            os: Ubuntu 18.04
             prepareEnvCommand: None
             command: echo none
             checkCommand: None
