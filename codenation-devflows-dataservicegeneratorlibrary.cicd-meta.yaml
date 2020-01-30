@@ -1,0 +1,69 @@
+version: v3
+navigator:
+  name: Sai Sri Vathsa Vemula
+  email: vathsa.vemula@codenation.co.in
+companyName: CodeNation  
+productName: devflows
+c4containerName: DataServiceGeneratorLibrary
+repoUrl: https://github.com/trilogy-group/swagger-django-generator
+repoBranch: master
+githubTeamName: CN
+needsLowLevelHardwareAccess: False
+needsDockerServer: False
+type: Deployable service
+buildAndDistribute:
+  types:
+    name: ci
+  sourceDependencies:
+  triggerOnSuccessOf: 
+  envVars:
+  os: Ubuntu 18.04
+  techStack: Python
+  toolchainVersion: python 3.6
+  runtimeVersion: python 3.6
+  build:
+    tool: NA
+    preBuildCommand: echo none
+    buildCommand: echo none
+  test:
+    utFramework: pytest
+    testCommand: python -m unittest
+  package:
+    tool: pip
+    command: echo none
+    artifactDir: ./target
+  distribution:
+    artifactUploadCommand: echo none
+  requiresIntegrationTests: false
+deployment:
+  dependentServices:
+  serviceName: DataServiceGeneratorLibrary 
+  overridableProps:
+    guiType: N/A
+    envVars:
+    ports:
+    stickySessions: false
+    canUseLb: true
+    stablePersistence: false
+    fixedNetworkIdentifier: false
+    storage:
+    provision:
+      os: Amazon linux 2
+      prepareEnvCommand: None
+      command: "echo none"
+      checkCommand: None
+    install:
+      dockerized: true
+      runtimeOs: Ubuntu 18.04
+      runtimeEnv: python 3.6
+      installCommand: None
+    run:
+      command: 'N/A will run on devflows'
+      userName: root
+      os: Ubuntu 18.04
+      mode: doNothing
+    deploymentCheck:
+      exec:
+        command: 'N/A will run on devflows'
+  targets:
+    - name: Default
