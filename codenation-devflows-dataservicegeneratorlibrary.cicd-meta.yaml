@@ -35,3 +35,36 @@ buildAndDistribute:
   distribution:
     artifactUploadCommand: "echo none"
   requiresIntegrationTests: false
+
+deployment:
+  dependentServices:
+  serviceName: DevflowTest #task name 
+  overridableProps:
+    guiType: "N/A"
+    envVars:
+    ports:
+    stickySessions: false
+    canUseLb: true
+    stablePersistence: false
+    fixedNetworkIdentifier: false
+    storage:
+    provision:
+      os: Amazon linux 2
+      prepareEnvCommand: None
+      command: "echo none"
+      checkCommand: None
+    install:
+      dockerized: true
+      runtimeOs: Ubuntu 18.04
+      runtimeEnv: python 3.6
+      installCommand: None
+    run:
+      command: 'N/A will run on devflows'
+      userName: root
+      os: Ubuntu 18.04
+      mode: doNothing
+    deploymentCheck:
+      exec:
+        command: 'N/A will run on devflows'
+  targets:
+    - name: Default
