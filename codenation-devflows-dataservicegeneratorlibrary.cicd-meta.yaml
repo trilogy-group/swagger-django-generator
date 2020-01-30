@@ -6,7 +6,6 @@ companyName: CodeNation
 productName: devflows
 c4containerName: DataServiceGeneratorLibrary
 repoUrl: https://github.com/trilogy-group/swagger-django-generator
-repoBranch: master
 githubTeamName: CN
 needsLowLevelHardwareAccess: false
 needsDockerServer: false
