@@ -10,7 +10,7 @@ repoBranch: master
 githubTeamName: 'CN' 
 needsLowLevelHardwareAccess: False
 needsDockerServer: False
-type: Distributable artifacts
+type: Deployable service
 buildAndDistribute:
   types:
     name: ci
@@ -35,7 +35,6 @@ buildAndDistribute:
   distribution:
     artifactUploadCommand: "echo none"
   requiresIntegrationTests: false
-
 deployment:
   dependentServices:
   serviceName: DevflowTest #task name 
