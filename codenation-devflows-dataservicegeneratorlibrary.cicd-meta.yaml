@@ -7,7 +7,7 @@ productName: devflows
 c4containerName: DataServiceGeneratorLibrary
 repoUrl: https://github.com/trilogy-group/swagger-django-generator
 repoBranch: master
-githubTeamName: 'CN' 
+githubTeamName: CN
 needsLowLevelHardwareAccess: False
 needsDockerServer: False
 type: Deployable service
@@ -33,13 +33,13 @@ buildAndDistribute:
     command: echo none
     artifactDir: ./target
   distribution:
-    artifactUploadCommand: "echo none"
+    artifactUploadCommand: echo none
   requiresIntegrationTests: false
 deployment:
   dependentServices:
-  serviceName: DevflowTest #task name 
+  serviceName: DataServiceGeneratorLibrary 
   overridableProps:
-    guiType: "N/A"
+    guiType: N/A
     envVars:
     ports:
     stickySessions: false
