@@ -181,6 +181,11 @@ def path_to_class_name(path):
         # preserving the case of the letters thereafter.
         p[0].upper() + p[1:] for p in sanitised.split("/") if p
     )
+    class_name = u"".join(
+        # Uppercase the first letter of each non-empty word, while
+        # preserving the case of the letters thereafter.
+        p[0].upper() + p[1:] for p in class_name.split("-") if p
+    )
     return class_name or ROOT_CLASS_NAME
 
 
