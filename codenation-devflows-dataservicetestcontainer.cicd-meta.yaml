@@ -34,7 +34,7 @@ buildAndDistribute:
     distribution:
         artifactUploadCommand: echo none
 deployment:
-    serviceName: DevflowTest
+    serviceName: Task Name
     overridableProps:
         guiType: N/A
         canUseLb: true
@@ -53,5 +53,8 @@ deployment:
             mode: doNothing
             command: N/A will run on devflows
             userName: root
+        integrationTest:
+            preTestCommand: n/a
+            testCommand: n/a
     targets:
       - name: Default
