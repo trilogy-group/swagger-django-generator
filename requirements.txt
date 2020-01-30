@@ -9,6 +9,7 @@ parameterized
 django
 aiohttp
 aiohttp-cors
+twine 
 
 # The following requirements are required by jsonschema
 # in order to do proper validation of certain formats.
