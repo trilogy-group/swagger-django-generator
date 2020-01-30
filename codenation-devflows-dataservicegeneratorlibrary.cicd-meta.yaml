@@ -33,7 +33,7 @@ buildAndDistribute:
     command: echo none
     artifactDir: ./target
   distribution:
-    artifactUploadCommand: echo none
+    artifactUploadCommand: 'python setup.py sdist && twine upload --repository-url https://pypi.swarm.devfactory.com/ --verbose dist/* --username $username --password $password'
   requiresIntegrationTests: false
 deployment:
   dependentServices:
