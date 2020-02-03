@@ -152,24 +152,12 @@ class {{ class_name }}(View):
 
       {% endfor %}
     {% endif %}
-            result = Stubs.{{ info.operation }}(request, {% if info.body %}body, {% endif %}{% if info.form_data %}form_data, {% endif %}
+            result, status = Stubs.{{ info.operation }}(request, {% if info.body %}body, {% endif %}{% if info.form_data %}form_data, {% endif %}
                 {% for ra in info.required_args %}{{ ra.name }}, {% endfor %}
                 {% for oa in info.optional_args if oa.in == "query" %}{{ oa.name }}, {% endfor %})
-
-            if type(result) is tuple:
-                result, headers = result
-            else:
-                headers = {}
-
-            # The result may contain fields with date or datetime values that will not
-            # pass JSON validation. We first create the response, and then maybe validate
-            # the response content against the schema.
-            response = JsonResponse(result, safe=False)
+            response = JsonResponse(result, status=status, safe=False)
 
             maybe_validate_result(response.content, self.{{ verb|upper }}_RESPONSE_SCHEMA)
-
-            for key, val in headers.items():
-                response[key] = val
 
             return response
         except ValidationError as ve:
@@ -183,16 +171,3 @@ class {{ class_name }}(View):
 
 
 {% endfor %}
-class __SWAGGER_SPEC__(View):
-
-    def get(self, request, *args, **kwargs):
-        spec = json.loads("""{{ specification }}""")
-        # Mod spec to point to demo application
-        spec["basePath"] = "/"
-        spec["host"] = "localhost:8000"
-        # Add basic auth as a security definition
-        security_definitions = spec.get("securityDefinitions", {})
-        security_definitions["basic_auth"] = {"type": "basic"}
-        spec["securityDefinitions"] = security_definitions
-        return JsonResponse(spec)
-
