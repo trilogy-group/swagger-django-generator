@@ -2,7 +2,6 @@
 Do not modify this file. It is generated from the Swagger specification.
 """
 import json
-from apitools.datagenerator import DataGenerator
 
 import {{ module }}.schemas as schemas
 
@@ -45,7 +44,6 @@ class MockedStubClass(AbstractStubClass):
     """
     Provides a mocked implementation of the AbstractStubClass.
     """
-    GENERATOR = DataGenerator()
 {% for class_name, verbs in classes|dictsort(true) %}
     {% for verb, info in verbs|dictsort(true) %}
 
@@ -70,13 +68,8 @@ class MockedStubClass(AbstractStubClass):
         :type {{ oa.name }}: {{ oa.type }}
         {% endfor %}
         """
-        response_schema = {{ info.response_schema }}
-        if "type" not in response_schema:
-            response_schema["type"] = "object"
+        
 
-        if response_schema["type"] == "array" and "type" not in response_schema["items"]:
-            response_schema["items"]["type"] = "object"
-
-        return MockedStubClass.GENERATOR.random_value(response_schema)
+        return {}
     {% endfor %}
 {% endfor %}

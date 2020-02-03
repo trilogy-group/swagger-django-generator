@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
   name = 'swagger_django_generator',         # How you named your package folder (MyLib)
   packages = ['./', 'swagger_django_generator', 'swagger_django_generator.templates.django'],   # Chose the same as "name"
-  version = '1.1',      # Start with a small number and increase it with every change you make
+  version = '1.4',      # Start with a small number and increase it with every change you make
   license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
   description = 'Convert given spec to django code',   # Give a short description about your library
   author = 'Sai Sri Vathsa Vemula',                   # Type in your name
