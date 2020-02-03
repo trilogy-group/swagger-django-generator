@@ -1,2 +1,2 @@
-from spec_to_django.runner import Runner
+from swagger_django_generator.runner import Runner
 
