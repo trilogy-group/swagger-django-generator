@@ -1,0 +1,53 @@
+version: v4.0
+navigator:
+  name: Sai Sri Vathsa Vemula
+  email: vathsa.vemula@codenation.co.in
+repo:
+  companyName: CodeNation
+  productName: devflows
+  repoUrl: 'https://github.com/trilogy-group/swagger-django-generator'
+  repoType: Deployable service
+  branch: master
+build:
+  techStack: Python
+  os: Ubuntu 18.04
+  toolchainVersion: python 3.6
+  tool: NA
+  preBuildCommand: >-
+    apt-get update -y && apt-get install -y python3-pip curl && python3 -m pip
+    install pip==9.0.3 && pip3 install -r requirements.txt && pip3 install
+    --upgrade keyrings.alt
+  buildCommand: python setup.py sdist
+test:
+  utFramework: pytest
+  preTestCommand: null
+  testCommand: python -m unittest
+package:
+  packageTool: pip
+  packageCommand: echo none
+  artifactDir: ./target
+  artifactUploadCommand: >-
+    twine upload --repository-url https://pypi.swarm.devfactory.com/ --verbose
+    dist/* --username $username --password $password
+deploy:
+  serviceName: DataServiceGeneratorLibrary
+  deploymentCheck: '#ToBeFilled'
+  stickySessions: null
+  canUseLb: true
+  stablePersistence: null
+  fixedNetworkIdentifier: null
+ports: []
+run:
+  dockerized: true
+  os: Ubuntu 18.04
+  image: ''
+  runtimeEnv: python 3.6
+  installCommand: None
+  installDir: ''
+  runCommand: N/A will run on devflows
+  userName: root
+envs:
+  - name: qa
+    default: true
+    vars: []
+storage: []
